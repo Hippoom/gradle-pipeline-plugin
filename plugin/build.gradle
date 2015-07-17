@@ -1,4 +1,6 @@
 apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 dependencies {
     compile gradleApi()
@@ -7,4 +9,77 @@ dependencies {
 
 jar {
     archiveName "${rootProject.name}-${rootProject.version}.jar"
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveName "${rootProject.name}-${rootProject.version}-javadoc.jar"
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
+    archiveName "${rootProject.name}-${rootProject.version}-sources.jar"
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives jar
+    archives sourcesJar
+    archives javadocJar
+}
+
+def publishStage() {
+    project.hasProperty('publishStage')? publishStage: false
+}
+
+if (publishStage()) {
+
+    signing {
+        sign configurations.archives
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: sonatypeUsername, password: sonatypePassword)
+                }
+
+                pom.project {
+                    groupId rootProject.group
+                    artifactId rootProject.name
+                    version rootProject.version
+
+                    name rootProject.name
+                    packaging 'jar'
+                    description 'A gradle plugin to simplify artifact sharing through continuous devilivery pipeline'
+                    url 'https://github.com/Hippoom/gradle-pipeline-plugin'
+
+                    scm {
+                        url 'scm:https://github.com/Hippoom/gradle-pipeline-plugin'
+                        connection 'scm:https://github.com/Hippoom/gradle-pipeline-plugin'
+                        developerConnection 'scm:https://github.com/Hippoom/gradle-pipeline-plugin'
+                    }
+
+                    licenses {
+                        license {
+                            name 'Apache License'
+                            url 'https://github.com/Hippoom/gradle-pipeline-plugin/blob/master/LICENSE'
+                            distribution 'repo'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'hippoom'
+                            name 'Yugang Zhou'
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
