@@ -1,0 +1,5 @@
+rootProject.name = 'gradle-pipeline-plugin'
+
+include 'plugin'
+include 'sample'
+

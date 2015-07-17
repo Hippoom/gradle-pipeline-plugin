@@ -1,0 +1,18 @@
+# Created by .ignore support plugin (hsz.mobi)
+# Gradle files
+.gradle/
+**/build/
+
+# idea files
+.idea/
+*.iml
+
+# mac
+**/.DS_Store
+
+# local
+gradle.properties
+
+# sample
+sample/bin/tmp
+sample/bin/libs/configured

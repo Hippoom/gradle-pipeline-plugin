@@ -1,0 +1,18 @@
+apply plugin: 'com.github.hippoom.pipeline'
+
+buildDir = 'bin'
+
+buildscript {
+    dependencies {
+        classpath project(':plugin')
+    }
+}
+
+repackDeployable {
+    deployableName = 'sample.war'
+    repackTask = 'aaa'
+}
+
+task aaa() << {
+    println 'aaa'
+}
